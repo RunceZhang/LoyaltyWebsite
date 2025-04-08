@@ -1,0 +1,170 @@
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id         Int       @id @default(autoincrement())
+  utorid     String    @unique
+  name       String
+  email      String    @unique
+  password   String
+  birthday   String?
+  role       String    @default("regular")
+  points     Int       @default(0)
+  createdAt  DateTime  @default(now())
+  lastLogin  DateTime?
+  verified   Boolean   @default(false)
+  isActive   Boolean   @default(false)  
+  avatarUrl  String?
+  suspicious Boolean   @default(false)
+  
+  // Activation and recovery
+  resetToken     String?   @unique
+  expiresAt      DateTime?
+  
+  // Relationships
+  transactions        Transaction[] @relation("userTransactions")
+  createdTransactions Transaction[] @relation("createdByUser")
+  processedTransactions Transaction[] @relation("processedByUser")
+  incomingTransfers   Transaction[] @relation("incomingTransfers")
+  outgoingTransfers   Transaction[] @relation("outgoingTransfers")
+  
+  // Event relationships
+  eventOrganizer      EventOrganizer[]
+  eventGuest          EventGuest[]
+  
+  // Promotion relationships
+  promotionUsages     PromotionUsage[]
+  
+  // For tracking who created a user (cashier)
+  createdBy   User?   @relation("UserCreator", fields: [createdById], references: [id])
+  createdById Int?
+  users       User[]  @relation("UserCreator")
+}
+
+model Transaction {
+  id          Int      @id @default(autoincrement())
+  userId      Int
+  user        User     @relation("userTransactions", fields: [userId], references: [id])
+  type        String   // purchase, redemption, adjustment, event, transfer
+  amount      Int      // Points earned/spent/adjusted (can be negative)
+  spent       Float?   // Dollar amount for purchases
+  redeemed    Int?     // Points redeemed (for redemptions)
+  remark      String?
+  createdAt   DateTime @default(now())
+  
+  // For tracking who created the transaction
+  createdById Int
+  createdBy   User     @relation("createdByUser", fields: [createdById], references: [id])
+  
+  // For suspicious transaction verification
+  suspicious  Boolean  @default(false)
+  
+  // For redemption processing
+  processed   Boolean? // Only for redemption transactions
+  processedById Int?
+  processedBy User?    @relation("processedByUser", fields: [processedById], references: [id])
+  
+  // For adjustments and transfers
+  relatedId   Int?     // Different meaning based on transaction type
+  
+  // For promotions
+  appliedPromotions    TransactionPromotion[]
+  
+  // For event transactions
+  eventId     Int?
+  event       Event?   @relation(fields: [eventId], references: [id])
+  
+  // For transfer transactions
+  recipientId Int?
+  recipient   User?    @relation("incomingTransfers", fields: [recipientId], references: [id])
+  senderId    Int?
+  sender      User?    @relation("outgoingTransfers", fields: [senderId], references: [id])
+}
+
+model TransactionPromotion {
+  id            Int       @id @default(autoincrement())
+  transactionId Int
+  transaction   Transaction @relation(fields: [transactionId], references: [id])
+  promotionId   Int
+  promotion     Promotion @relation(fields: [promotionId], references: [id])
+  
+  @@unique([transactionId, promotionId])
+}
+
+model Event {
+  id           Int       @id @default(autoincrement())
+  name         String
+  description  String
+  location     String
+  startTime    DateTime
+  endTime      DateTime
+  capacity     Int?      // null means unlimited capacity
+  points       Int       // total points allocated for the event
+  pointsRemain Int       // remaining points that can be awarded
+  pointsAwarded Int      @default(0) // points that have been awarded
+  published    Boolean   @default(false)
+  createdAt    DateTime  @default(now())
+  
+  // Relationships
+  organizers   EventOrganizer[]
+  guests       EventGuest[]
+  transactions Transaction[]
+}
+
+model EventOrganizer {
+  id        Int      @id @default(autoincrement())
+  eventId   Int
+  event     Event    @relation(fields: [eventId], references: [id])
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id])
+  createdAt DateTime @default(now())
+  
+  @@unique([eventId, userId])
+}
+
+model EventGuest {
+  id        Int      @id @default(autoincrement())
+  eventId   Int
+  event     Event    @relation(fields: [eventId], references: [id])
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id])
+  createdAt DateTime @default(now())
+  
+  @@unique([eventId, userId])
+}
+
+model Promotion {
+  id           Int       @id @default(autoincrement())
+  name         String
+  description  String
+  type         String    // "automatic" or "one-time"
+  startTime    DateTime
+  endTime      DateTime
+  minSpending  Float?    // minimum spending to qualify, null means no minimum
+  rate         Float?    // promotional rate (e.g., 0.01 means +1% points)
+  points       Int?      // bonus points, null means no bonus points
+  createdAt    DateTime  @default(now())
+  isOneTime    Boolean   @default(false)
+  isActive    Boolean   @default(true)
+  
+  // Relationships
+  transactions TransactionPromotion[]
+  usages       PromotionUsage[]
+}
+
+model PromotionUsage {
+  id          Int      @id @default(autoincrement())
+  userId      Int
+  promotionId Int
+  user        User     @relation(fields: [userId], references: [id])
+  promotion   Promotion @relation(fields: [promotionId], references: [id])
+  usedAt      DateTime @default(now())
+  
+  @@unique([userId, promotionId])
+}
