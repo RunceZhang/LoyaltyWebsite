@@ -6,6 +6,7 @@ import { useAuth } from '../../contexts/AuthContext';
 const Layout = () => {
   const { currentUser, logout, isManager, isCashier, isSuperuser } = useAuth();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -16,6 +17,10 @@ const Layout = () => {
 
   const toggleMobileMenu = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen);
+  };
+
+  const toggleDropdown = () => {
+    setIsDropdownOpen(!isDropdownOpen);
   };
 
   return (
@@ -90,22 +95,36 @@ const Layout = () => {
               <Link to="/admin/users" className="hover:text-blue-200">User Management</Link>
             )}
             
-            <div className="relative group">
-              <button className="flex items-center hover:text-blue-200">
+            <div className="relative">
+              <button 
+                className="flex items-center hover:text-blue-200"
+                onClick={toggleDropdown}
+              >
                 <span>{currentUser?.name}</span>
                 <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
                 </svg>
               </button>
-              <div className="absolute right-0 hidden group-hover:block bg-white text-gray-800 shadow-lg rounded-md py-2 mt-1 w-48 z-10">
-                <Link to="/profile" className="block px-4 py-2 hover:bg-gray-100">Profile</Link>
-                <button 
-                  onClick={handleLogout} 
-                  className="block w-full text-left px-4 py-2 hover:bg-gray-100"
-                >
-                  Logout
-                </button>
-              </div>
+              {isDropdownOpen && (
+                <div className="absolute right-0 bg-white text-gray-800 shadow-lg rounded-md py-2 mt-1 w-48 z-10">
+                  <Link 
+                    to="/profile" 
+                    className="block px-4 py-2 hover:bg-gray-100"
+                    onClick={() => setIsDropdownOpen(false)}
+                  >
+                    Profile
+                  </Link>
+                  <button 
+                    onClick={() => {
+                      handleLogout();
+                      setIsDropdownOpen(false);
+                    }} 
+                    className="block w-full text-left px-4 py-2 hover:bg-gray-100"
+                  >
+                    Logout
+                  </button>
+                </div>
+              )}
             </div>
           </nav>
         </div>
