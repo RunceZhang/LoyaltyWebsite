@@ -1,12 +1,13 @@
 // pages/transactions/TransactionListPage.js
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { transactionService } from '../../services/api';
 
 const TransactionListPage = () => {
   const { currentUser, isManager } = useAuth();
-  
+
+  const navigate = useNavigate();
   // State for transactions
   const [transactions, setTransactions] = useState([]);
   const [loading, setLoading] = useState(true);
