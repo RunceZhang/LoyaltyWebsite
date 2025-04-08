@@ -1,12 +1,13 @@
 // components/layout/Layout.js
 import React, { useState } from 'react';
-import { Outlet, Link, useNavigate } from 'react-router-dom';
+import { Outlet, Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 
 const Layout = () => {
   const { currentUser, logout, isManager, isCashier, isSuperuser } = useAuth();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
 
   const handleLogout = () => {
     logout();
@@ -50,18 +51,43 @@ const Layout = () => {
           {/* Desktop navigation */}
           <nav className="hidden md:flex items-center space-x-6">
             <Link to="/" className="hover:text-blue-200">Dashboard</Link>
-            <Link to="/transactions" className="hover:text-blue-200">Transactions</Link>
+            <Link to="/transactions/history" className="hover:text-blue-200">Transactions</Link>
             <Link to="/events" className="hover:text-blue-200">Events</Link>
+            <Link to="/promotions" className="hover:text-blue-200">Promotions</Link>
             
+            {/* Cashier specific links */}
             {isCashier && (
-              <Link to="/register" className="hover:text-blue-200">Register User</Link>
+              <>
+                <Link to="/register" className="hover:text-blue-200">Register User</Link>
+                <Link to="/transactions" className="hover:text-blue-200">Process Transactions</Link>
+              </>
             )}
             
+            {/* Manager specific links */}
             {isManager && (
               <>
                 <Link to="/users" className="hover:text-blue-200">Users</Link>
-                <Link to="/promotions" className="hover:text-blue-200">Promotions</Link>
+                <Link 
+                  to="/events/organizer" 
+                  className={`hover:text-blue-200 ${
+                    location.pathname.startsWith('/events/organizer') || 
+                    location.pathname.startsWith('/events/manage') ||
+                    location.pathname.startsWith('/events/guests') ||
+                    location.pathname.startsWith('/events/award') ||
+                    location.pathname.startsWith('/events/organizers') ||
+                    location.pathname.startsWith('/events/create')
+                      ? 'font-semibold text-blue-200'
+                      : ''
+                  }`}
+                >
+                  Manage Events
+                </Link>
               </>
+            )}
+            
+            {/* Superuser specific links */}
+            {isSuperuser && (
+              <Link to="/admin/users" className="hover:text-blue-200">User Management</Link>
             )}
             
             <div className="relative group">
@@ -89,18 +115,29 @@ const Layout = () => {
           <nav className="md:hidden bg-blue-700 py-3">
             <div className="container mx-auto px-4 flex flex-col space-y-3">
               <Link to="/" className="hover:text-blue-200" onClick={toggleMobileMenu}>Dashboard</Link>
-              <Link to="/transactions" className="hover:text-blue-200" onClick={toggleMobileMenu}>Transactions</Link>
+              <Link to="/transactions/history" className="hover:text-blue-200" onClick={toggleMobileMenu}>Transactions</Link>
               <Link to="/events" className="hover:text-blue-200" onClick={toggleMobileMenu}>Events</Link>
+              <Link to="/promotions" className="hover:text-blue-200" onClick={toggleMobileMenu}>Promotions</Link>
               
+              {/* Cashier specific links */}
               {isCashier && (
-                <Link to="/register" className="hover:text-blue-200" onClick={toggleMobileMenu}>Register User</Link>
+                <>
+                  <Link to="/register" className="hover:text-blue-200" onClick={toggleMobileMenu}>Register User</Link>
+                  <Link to="/transactions" className="hover:text-blue-200" onClick={toggleMobileMenu}>Process Transactions</Link>
+                </>
               )}
               
+              {/* Manager specific links */}
               {isManager && (
                 <>
                   <Link to="/users" className="hover:text-blue-200" onClick={toggleMobileMenu}>Users</Link>
-                  <Link to="/promotions" className="hover:text-blue-200" onClick={toggleMobileMenu}>Promotions</Link>
+                  <Link to="/events/organizer" className="hover:text-blue-200" onClick={toggleMobileMenu}>Manage Events</Link>
                 </>
+              )}
+              
+              {/* Superuser specific links */}
+              {isSuperuser && (
+                <Link to="/admin/users" className="hover:text-blue-200" onClick={toggleMobileMenu}>User Management</Link>
               )}
               
               <div className="border-t border-blue-600 pt-2">
