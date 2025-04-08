@@ -18,7 +18,7 @@ const port = (() => {
     return num;
 })();
 
-const FRONTEND_URL = process.env.FRONTEND_URL || "http://localhost:3001";
+const FRONTEND_URL = process.env.FRONTEND_URL || "http://localhost:3000";
 
 const express = require("express");
 const app = express();
@@ -43,7 +43,7 @@ if (!fs.existsSync(uploadDir)) {
 // Middlewares
 app.use(cors({
   origin: FRONTEND_URL,
-  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true
 }));
