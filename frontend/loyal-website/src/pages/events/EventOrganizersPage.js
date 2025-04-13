@@ -62,7 +62,7 @@ const EventOrganizersPage = () => {
   };
 
   const handleRemoveOrganizer = async (userId) => {
-    if (!confirm('Are you sure you want to remove this organizer?')) {
+    if (!window.confirm('Are you sure you want to remove this organizer?')) {
       return;
     }
     
