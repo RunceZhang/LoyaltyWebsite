@@ -5,7 +5,7 @@ import api from '../../services/api';
 
 const UserManagementPage = () => {
   const navigate = useNavigate();
-  const { isSuperuser } = useAuth();
+  const { isSuperuser, isManager } = useAuth();
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -24,13 +24,14 @@ const UserManagementPage = () => {
   const [newRole, setNewRole] = useState('');
 
   useEffect(() => {
-    if (!isSuperuser) {
+    // Redirect if neither superuser nor manager
+    if (!isSuperuser && !isManager) {
       navigate('/dashboard');
       return;
     }
-    
+
     fetchUsers();
-  }, [filters, isSuperuser]);
+  }, [filters, isSuperuser, isManager]);
 
   const fetchUsers = async () => {
     setLoading(true);
@@ -127,7 +128,19 @@ const UserManagementPage = () => {
     
     try {
       await api.patch(`/users/${selectedUser.id}`, { role: newRole });
-      
+
+      if (isManager && newRole !== 'cashier') {
+        setError('Managers can only promote users to cashier.');
+        setTimeout(() => setError(null), 3000);
+        return;
+      }
+
+      if (isManager && selectedUser.role !== 'regular') {
+        setError('Managers can only promote regular users to cashier.');
+        setTimeout(() => setError(null), 3000);
+        return;
+      }
+
       // Update the user in the list
       setUsers(prev => prev.map(user => 
         user.id === selectedUser.id ? { ...user, role: newRole } : user
@@ -156,7 +169,7 @@ const UserManagementPage = () => {
     }
   };
 
-  if (!isSuperuser) {
+  if (!isSuperuser && !isManager) {
     return null; // Already redirected by useEffect
   }
 
@@ -308,12 +321,14 @@ const UserManagementPage = () => {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                       <div className="flex justify-end space-x-2">
-                        <button
-                          onClick={() => openRoleModal(user)}
-                          className="text-indigo-600 hover:text-indigo-900"
-                        >
-                          Change Role
-                        </button>
+                        {(isSuperuser || (isManager && user.role === 'regular')) && (
+                            <button
+                                onClick={() => openRoleModal(user)}
+                                className="text-indigo-600 hover:text-indigo-900"
+                            >
+                              Change Role
+                            </button>
+                        )}
                         {!user.verified && (
                           <button
                             onClick={() => handleVerifyUser(user.id)}
@@ -411,14 +426,18 @@ const UserManagementPage = () => {
                       <div className="mb-4">
                         <label className="block text-sm font-medium text-gray-700 mb-1">Role</label>
                         <select
-                          value={newRole}
-                          onChange={handleRoleChange}
-                          className="w-full p-2 border border-gray-300 rounded"
+                            value={newRole}
+                            onChange={handleRoleChange}
+                            className="mt-2 w-full border border-gray-300 p-2 rounded"
                         >
                           <option value="regular">Regular</option>
                           <option value="cashier">Cashier</option>
-                          <option value="manager">Manager</option>
-                          <option value="superuser">Superuser</option>
+                          {isSuperuser && (
+                              <>
+                                <option value="manager">Manager</option>
+                                <option value="superuser">Superuser</option>
+                              </>
+                          )}
                         </select>
                       </div>
                       
