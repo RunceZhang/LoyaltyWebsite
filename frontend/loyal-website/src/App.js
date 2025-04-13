@@ -19,6 +19,8 @@ import EventAwardPointsPage from './pages/events/EventAwardPointsPage';
 import EventOrganizersPage from './pages/events/EventOrganizersPage';
 import EventCreatePage from './pages/events/EventCreatePage';
 import PromotionListPage from './pages/promotions/PromotionListPage';
+import PromotionCreatePage from './pages/promotions/PromotionCreatePage';
+import PromotionDetailPage from './pages/promotions/PromotionDetailPage';
 import Layout from './components/layout/Layout';
 import PrivateRoute from './components/auth/PrivateRoute';
 import NotFoundPage from './pages/NotFoundPage';
@@ -59,8 +61,10 @@ function App() {
         
         {/* Promotion routes */}
         <Route path="/promotions" element={<PromotionListPage />} />
-        
-        {/* Superuser routes */}
+          <Route path="/promotions/create" element={<PrivateRoute requiredRole="manager"><PromotionCreatePage /></PrivateRoute>} />
+          <Route path="/promotions/:promotionId" element={<PrivateRoute requiredRole="manager"><PromotionDetailPage /></PrivateRoute>} />
+
+          {/* Superuser routes */}
         <Route path="/admin/users" element={<PrivateRoute requiredRole="superuser"><UserManagementPage /></PrivateRoute>} />
       </Route>
       
