@@ -92,7 +92,11 @@ const EventManagementPage = () => {
       fetchEvent(); // Refresh the data
     } catch (err) {
       console.error('Error updating event:', err);
-      setError(err.response?.data?.message || 'Failed to update event. Please try again.');
+      if (err.response?.status === 400) {
+        setError('Can\'t edit event that is already ended.');
+      } else {
+        setError(err.response?.data?.message || 'Failed to update event. Please try again.');
+      }
       setTimeout(() => setError(null), 3000);
     }
   };

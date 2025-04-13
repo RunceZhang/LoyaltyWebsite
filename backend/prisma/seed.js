@@ -131,6 +131,17 @@ async function seedUsers() {
       isActive: true,
       points: 175,
       birthday: '1999-07-07'
+    },
+    {
+      utorid: 'superuser001',
+      name: 'Suppa Ussa',
+      email: 'super.user@utoronto.ca',
+      password: defaultPassword, 
+      role: 'superuser',
+      verified: true,
+      isActive: true,
+      points: 0,
+      birthday: '1999-07-07'
     }
   ];
 

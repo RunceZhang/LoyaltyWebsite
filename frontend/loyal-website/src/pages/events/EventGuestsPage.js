@@ -22,8 +22,8 @@ const EventGuestsPage = () => {
 
   useEffect(() => {
     if (guests.length > 0 && searchQuery) {
-      setFilteredGuests(guests.filter(guest => 
-        guest.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
+      setFilteredGuests(guests.filter(guest =>
+        guest.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
         guest.utorid.toLowerCase().includes(searchQuery.toLowerCase())
       ));
     } else {
@@ -48,30 +48,29 @@ const EventGuestsPage = () => {
 
   const handleAddGuest = async (e) => {
     e.preventDefault();
-    
+
     if (!guestFormData.utorid.trim()) {
       setError('Please enter a valid UTORid.');
       setTimeout(() => setError(null), 3000);
       return;
     }
-    
+
     try {
       const response = await api.post(`/events/${eventId}/guests`, {
         utorid: guestFormData.utorid.trim()
       });
-      
+
       // Add the new guest to the list
       if (response.data.guestAdded) {
         setGuests(prev => [...prev, response.data.guestAdded]);
       }
-      
+
       setSuccessMessage(`${guestFormData.utorid} has been added to the event successfully!`);
       setTimeout(() => setSuccessMessage(''), 3000);
       setGuestFormData({ utorid: '' });
       fetchEvent(); // Refresh the guest list
     } catch (err) {
-      console.error('Error adding guest:', err);
-      setError(err.response?.data?.message || 'Failed to add guest. Please check the UTORid and try again.');
+      setError(err.response?.data?.message || 'Failed to add guest. Either the event has ended or full, or that the UTORid doesn\'t exist.');
       setTimeout(() => setError(null), 3000);
     }
   };
@@ -80,12 +79,12 @@ const EventGuestsPage = () => {
     if (!window.confirm('Are you sure you want to remove this guest?')) {
       return;
     }
-    
+
     try {
       await api.delete(`/events/${eventId}/guests/${userId}`);
       setSuccessMessage('Guest removed successfully!');
       setTimeout(() => setSuccessMessage(''), 3000);
-      
+
       // Update the guest list
       setGuests(prev => prev.filter(guest => guest.id !== userId));
     } catch (err) {
@@ -121,7 +120,7 @@ const EventGuestsPage = () => {
       <div className="container mx-auto px-4 py-8">
         <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
           <span className="block sm:inline">{error}</span>
-          <button 
+          <button
             className="mt-4 bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded"
             onClick={() => navigate('/events/organizer')}
           >
@@ -137,7 +136,7 @@ const EventGuestsPage = () => {
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold">Manage Guests: {event.name}</h1>
         <div>
-          <button 
+          <button
             onClick={() => navigate(`/events/manage/${eventId}`)}
             className="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded"
           >
@@ -151,7 +150,7 @@ const EventGuestsPage = () => {
           <span className="block sm:inline">{error}</span>
         </div>
       )}
-      
+
       {successMessage && (
         <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-6" role="alert">
           <span className="block sm:inline">{successMessage}</span>
@@ -175,14 +174,14 @@ const EventGuestsPage = () => {
                 required
               />
             </div>
-            <button 
+            <button
               type="submit"
               className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded w-full"
             >
               Add Guest
             </button>
           </form>
-          
+
           <div className="mt-6">
             <p className="text-gray-700">
               <span className="font-semibold">Event Capacity:</span> {event.capacity ? `${guests.length}/${event.capacity}` : `${guests.length} (No limit)`}
@@ -199,7 +198,7 @@ const EventGuestsPage = () => {
             </p>
           </div>
         </div>
-        
+
         {/* Guest List */}
         <div className="bg-white shadow rounded-lg p-6">
           <div className="flex justify-between items-center mb-4">
@@ -219,7 +218,7 @@ const EventGuestsPage = () => {
               </div>
             </div>
           </div>
-          
+
           {filteredGuests.length === 0 ? (
             <p className="text-gray-700 text-center py-8">No guests found.</p>
           ) : (
@@ -241,7 +240,7 @@ const EventGuestsPage = () => {
                       <td className="px-6 py-4 whitespace-nowrap">{guest.utorid}</td>
                       {isManager && (
                         <td className="px-6 py-4 whitespace-nowrap text-right">
-                          <button 
+                          <button
                             onClick={() => handleRemoveGuest(guest.id)}
                             className="text-red-600 hover:text-red-900"
                           >

@@ -71,7 +71,6 @@ const Layout = () => {
             {/* Manager specific links */}
             {isManager && (
               <>
-                <Link to="/users" className="hover:text-blue-200">Users</Link>
                 <Link 
                   to="/events/organizer" 
                   className={`hover:text-blue-200 ${
@@ -89,11 +88,6 @@ const Layout = () => {
                 </Link>
                 <Link to="/admin/users" className="hover:text-blue-200">User Management</Link>
               </>
-            )}
-            
-            {/* Superuser specific links */}
-            {isSuperuser && (
-              <Link to="/admin/users" className="hover:text-blue-200">User Management</Link>
             )}
             
             <div className="relative">
@@ -150,7 +144,6 @@ const Layout = () => {
               {/* Manager specific links */}
               {isManager && (
                 <>
-                  <Link to="/users" className="hover:text-blue-200" onClick={toggleMobileMenu}>Users</Link>
                   <Link to="/events/organizer" className="hover:text-blue-200" onClick={toggleMobileMenu}>Manage Events</Link>
                 </>
               )}
