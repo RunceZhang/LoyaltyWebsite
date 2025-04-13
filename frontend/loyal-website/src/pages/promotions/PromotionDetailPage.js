@@ -1,7 +1,7 @@
 // pages/promotions/PromotionDetailPage.js
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import api from '../../services/api';
+import api, { promotionService } from '../../services/api';
 import { useAuth } from '../../contexts/AuthContext';
 
 const PromotionDetailPage = () => {
@@ -11,31 +11,35 @@ const PromotionDetailPage = () => {
     const [promotion, setPromotion] = useState(null);
     const [loading, setLoading] = useState(true);
     const [editing, setEditing] = useState(false);
+    const [error, setError] = useState('');
     const [formData, setFormData] = useState({
-        title: '',
+        name: '',
         description: '',
-        startDate: '',
-        endDate: ''
+        startTime: '',
+        endTime: ''
     });
 
     useEffect(() => {
         const fetchPromotion = async () => {
+            setLoading(true);
+            setError(''); // ✅ defined
             try {
-                const res = await api.get(`/promotions/${promotionId}`);
-                setPromotion(res.data);
+                const response = await promotionService.getPromotion(promotionId);
+                setPromotion(response.data);
                 setFormData({
-                    title: res.data.title,
-                    description: res.data.description,
-                    startDate: res.data.startDate,
-                    endDate: res.data.endDate
+                    name: response.data.name,
+                    description: response.data.description,
+                    startTime: response.data.startTime?.slice(0, 10) || '',
+                    endTime: response.data.endTime?.slice(0, 10) || ''
                 });
+
             } catch (err) {
-                console.error('Failed to fetch promotion:', err);
-                alert('Failed to fetch promotion');
+                setError('Failed to fetch promotion: ' + (err.response?.data?.message || err.message));
             } finally {
                 setLoading(false);
             }
         };
+
         fetchPromotion();
     }, [promotionId]);
 
@@ -65,6 +69,7 @@ const PromotionDetailPage = () => {
 
     if (loading) return <div>Loading...</div>;
     if (!promotion) return <div>Promotion not found</div>;
+    if (error) return <div className="text-red-500">{error}</div>;
 
     return (
         <div style={{ padding: '20px', maxWidth: '600px', margin: '0 auto' }}>
@@ -75,8 +80,8 @@ const PromotionDetailPage = () => {
                         <label>Title:</label>
                         <input
                             type="text"
-                            value={formData.title}
-                            onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                            value={formData.name}
+                            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                             style={{ width: '100%', padding: '8px', marginTop: '4px' }}
                         />
                     </div>
@@ -95,8 +100,8 @@ const PromotionDetailPage = () => {
                         <label>Start Date:</label>
                         <input
                             type="date"
-                            value={formData.startDate}
-                            onChange={(e) => setFormData({ ...formData, startDate: e.target.value })}
+                            value={formData.startTime}
+                            onChange={(e) => setFormData({ ...formData, startTime: e.target.value })}
                             style={{ width: '100%', padding: '8px', marginTop: '4px' }}
                         />
                     </div>
@@ -105,8 +110,8 @@ const PromotionDetailPage = () => {
                         <label>End Date:</label>
                         <input
                             type="date"
-                            value={formData.endDate}
-                            onChange={(e) => setFormData({ ...formData, endDate: e.target.value })}
+                            value={formData.endTime}
+                            onChange={(e) => setFormData({ ...formData, endTime: e.target.value })}
                             style={{ width: '100%', padding: '8px', marginTop: '4px' }}
                         />
                     </div>
@@ -118,10 +123,10 @@ const PromotionDetailPage = () => {
                 </>
             ) : (
                 <>
-                    <p><strong>Title:</strong> {promotion.title}</p>
+                    <p><strong>Title:</strong> {promotion.name}</p>
                     <p><strong>Description:</strong> {promotion.description}</p>
-                    <p><strong>Start Date:</strong> {promotion.startDate}</p>
-                    <p><strong>End Date:</strong> {promotion.endDate}</p>
+                    <p><strong>Start Date:</strong> {promotion.startTime}</p>
+                    <p><strong>End Date:</strong> {promotion.endTime}</p>
 
                     {isManager && (
                         <div style={{ marginTop: '20px' }}>

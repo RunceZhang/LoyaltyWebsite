@@ -36,8 +36,19 @@ const PromotionCreatePage = () => {
         setError('');
         setSuccess('');
 
+        const payload = {
+            name: promotionData.name.trim(),
+            description: promotionData.description.trim(),
+            startTime: new Date(promotionData.startTime).toISOString(),
+            endTime: new Date(promotionData.endTime).toISOString(),
+            rate: parseFloat(promotionData.rate),
+            minSpending: promotionData.minSpending === '' ? null : parseFloat(promotionData.minSpending),
+            type: promotionData.type
+        };
+
+
         try {
-            const response = await promotionService.createPromotion(promotionData);
+            const response = await promotionService.createPromotion(payload);
             setSuccess('Promotion created successfully!');
             // Redirect to the promotion list page after successful creation
             navigate('/promotions');
