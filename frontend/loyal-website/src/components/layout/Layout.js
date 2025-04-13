@@ -87,6 +87,7 @@ const Layout = () => {
                 >
                   Manage Events
                 </Link>
+                <Link to="/admin/users" className="hover:text-blue-200">User Management</Link>
               </>
             )}
             

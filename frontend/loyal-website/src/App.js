@@ -65,7 +65,8 @@ function App() {
           <Route path="/promotions/:promotionId" element={<PrivateRoute requiredRole="manager"><PromotionDetailPage /></PrivateRoute>} />
 
           {/* Superuser routes */}
-        <Route path="/admin/users" element={<PrivateRoute requiredRole="superuser"><UserManagementPage /></PrivateRoute>} />
+          <Route path="/admin/users" element={<PrivateRoute requiredRoles={['superuser', 'manager']}><UserManagementPage /></PrivateRoute>} />
+
       </Route>
       
       {/* Catch all route */}
