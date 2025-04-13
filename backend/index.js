@@ -249,9 +249,9 @@ app.delete('/events/:eventId/organizers/:userId', requireManager, eventControlle
 
 // Event Guests Routes
 app.post('/events/:eventId/guests', requireEventOrganizer, eventController.addGuest);
-app.delete('/events/:eventId/guests/:userId', requireManager, eventController.removeGuest);
 app.post('/events/:eventId/guests/me', requireRegular, eventController.addCurrentUserAsGuest);
 app.delete('/events/:eventId/guests/me', requireRegular, eventController.removeCurrentUserAsGuest);
+app.delete('/events/:eventId/guests/:userId', requireManager, eventController.removeGuest);
 
 // Event Transactions Routes
 app.post('/events/:eventId/transactions', requireEventOrganizer, eventController.createEventTransaction);
