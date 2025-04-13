@@ -70,8 +70,7 @@ const EventGuestsPage = () => {
       setGuestFormData({ utorid: '' });
       fetchEvent(); // Refresh the guest list
     } catch (err) {
-      console.error('Error adding guest:', err);
-      setError(err.response?.data?.message || 'Failed to add guest. Please check the UTORid and try again.');
+      setError(err.response?.data?.message || 'Failed to add guest. Either the event has ended or full, or that the UTORid doesn\'t exist.');
       setTimeout(() => setError(null), 3000);
     }
   };
