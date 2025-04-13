@@ -35,6 +35,23 @@ const EventListPage = () => {
           delete params[key];
         }
       });
+
+    
+    if (params.started === false && params.ended === false) {
+      // If both are false, remove both as they're the default state
+      delete params.started;
+      delete params.ended;
+    } else if (params.started === false) {
+      // If only started is false (default), remove it
+      delete params.started;
+    } else if (params.ended === false) {
+      // If only ended is false (default), remove it
+      delete params.ended;
+    }
+    
+    if (params.showFull === false) {
+      delete params.showFull;
+    }
       
       const response = await eventService.getEvents(params);
       setEvents(response.data.results);
