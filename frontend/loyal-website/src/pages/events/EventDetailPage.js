@@ -67,7 +67,10 @@ const EventDetailPage = () => {
     } catch (err) {
       if (err.response?.status === 410) {
         setError('Sorry, this event is either full or has ended.');
-      } else {
+      } else if (err.response?.status === 400) {
+        setError('You are the organizer or you are already on the guest list');
+      }
+      else {
         setError('Failed to RSVP: ' + (err.response?.data?.message || err.message));
       }
     } finally {
@@ -95,7 +98,10 @@ const EventDetailPage = () => {
         setError('The event has already ended, and RSVPs cannot be canceled.');
       } else if (err.response?.status === 404) {
         setError('You have not RSVP\'d to this event.');
-      } else {
+      } else if (err.response?.status === 403) {
+        setError('You don\'t have sufficient permission.');
+      }
+      else {
         setError('Failed to cancel RSVP: ' + (err.response?.data?.message || err.message));
       }
     } finally {
