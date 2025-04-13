@@ -77,7 +77,7 @@ const EventGuestsPage = () => {
   };
 
   const handleRemoveGuest = async (userId) => {
-    if (!confirm('Are you sure you want to remove this guest?')) {
+    if (!window.confirm('Are you sure you want to remove this guest?')) {
       return;
     }
     
