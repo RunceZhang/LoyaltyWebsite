@@ -1,5 +1,5 @@
 // pages/transactions/TransactionDetailPage.js
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { transactionService } from '../../services/api';
@@ -17,11 +17,7 @@ const TransactionDetailPage = () => {
   // For manager action - marking as suspicious/not suspicious
   const [changingSuspiciousStatus, setChangingSuspiciousStatus] = useState(false);
 
-  useEffect(() => {
-    fetchTransaction();
-  }, [transactionId]);
-
-  const fetchTransaction = async () => {
+  const fetchTransaction = useCallback(async () => {
     try {
       setLoading(true);
       setError('');
@@ -63,7 +59,11 @@ const TransactionDetailPage = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [transactionId, isManager]);
+
+  useEffect(() => {
+    fetchTransaction();
+  }, [fetchTransaction]);
 
   const handleToggleSuspicious = async () => {
     if (!isManager || !transaction) return;

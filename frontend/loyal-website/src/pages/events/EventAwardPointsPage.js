@@ -19,10 +19,27 @@ const EventAwardPointsPage = () => {
     remark: ''
   });
 
+  // Fetch event details when component loads or eventId changes
   useEffect(() => {
+    const fetchEvent = async () => {
+      setLoading(true);
+      try {
+        const response = await api.get(`/events/${eventId}`);
+        setEvent(response.data);
+        setGuests(response.data.guests || []);
+        setFilteredGuests(response.data.guests || []);
+        setLoading(false);
+      } catch (err) {
+        console.error('Error fetching event:', err);
+        setError('Failed to load event details. Please try again later.');
+        setLoading(false);
+      }
+    };
+
     fetchEvent();
   }, [eventId]);
 
+  // Filter guests based on search query
   useEffect(() => {
     if (guests.length > 0 && searchQuery) {
       setFilteredGuests(guests.filter(guest => 
@@ -33,21 +50,6 @@ const EventAwardPointsPage = () => {
       setFilteredGuests(guests);
     }
   }, [guests, searchQuery]);
-
-  const fetchEvent = async () => {
-    setLoading(true);
-    try {
-      const response = await api.get(`/events/${eventId}`);
-      setEvent(response.data);
-      setGuests(response.data.guests || []);
-      setFilteredGuests(response.data.guests || []);
-      setLoading(false);
-    } catch (err) {
-      console.error('Error fetching event:', err);
-      setError('Failed to load event details. Please try again later.');
-      setLoading(false);
-    }
-  };
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -92,7 +94,7 @@ const EventAwardPointsPage = () => {
         payload.utorid = selectedGuest.utorid;
       }
       
-      const response = await api.post(`/events/${eventId}/transactions`, payload);
+      await api.post(`/events/${eventId}/transactions`, payload);
       
       setSuccessMessage(awardAll 
         ? `${pointsFormData.amount} points awarded to all guests successfully!` 
@@ -105,7 +107,18 @@ const EventAwardPointsPage = () => {
       setAwardAll(false);
       
       // Refresh event data to get updated points remaining
-      fetchEvent();
+      const refreshEvent = async () => {
+        try {
+          const response = await api.get(`/events/${eventId}`);
+          setEvent(response.data);
+          setGuests(response.data.guests || []);
+          setFilteredGuests(response.data.guests || []);
+        } catch (err) {
+          console.error('Error refreshing event:', err);
+        }
+      };
+      
+      refreshEvent();
     } catch (err) {
       console.error('Error awarding points:', err);
       setError(err.response?.data?.message || 'Failed to award points. Please try again.');

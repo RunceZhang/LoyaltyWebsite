@@ -1,11 +1,11 @@
 // pages/transactions/TransactionListPage.js
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { transactionService } from '../../services/api';
 
 const TransactionListPage = () => {
-  const { currentUser, isManager } = useAuth();
+  const { isManager } = useAuth(); 
 
   const navigate = useNavigate();
   // State for transactions
@@ -16,7 +16,7 @@ const TransactionListPage = () => {
   
   // State for pagination
   const [page, setPage] = useState(1);
-  const [limit, setLimit] = useState(10);
+  const [limit] = useState(10); 
   
   // State for filters
   const [filters, setFilters] = useState({
@@ -34,7 +34,7 @@ const TransactionListPage = () => {
   });
   
   // Function to load transactions
-  const loadTransactions = async () => {
+  const loadTransactions = useCallback(async () => {
     try {
       setLoading(true);
       setError('');
@@ -79,12 +79,12 @@ const TransactionListPage = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [page, limit, filters, managerFilters, isManager]);
   
   // Load transactions on mount and when filters change
   useEffect(() => {
     loadTransactions();
-  }, [page, limit, isManager]);
+  }, [loadTransactions]);
   
   // Handle filter change
   const handleFilterChange = (e) => {

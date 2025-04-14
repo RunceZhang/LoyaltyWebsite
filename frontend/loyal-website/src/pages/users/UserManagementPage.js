@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import api from '../../services/api';
@@ -23,17 +23,7 @@ const UserManagementPage = () => {
   const [roleModalOpen, setRoleModalOpen] = useState(false);
   const [newRole, setNewRole] = useState('');
 
-  useEffect(() => {
-    // Redirect if neither superuser nor manager
-    if (!isSuperuser && !isManager) {
-      navigate('/dashboard');
-      return;
-    }
-
-    fetchUsers();
-  }, [filters, isSuperuser, isManager]);
-
-  const fetchUsers = async () => {
+  const fetchUsers = useCallback(async () => {
     setLoading(true);
     try {
       // Create query params from filters
@@ -53,7 +43,17 @@ const UserManagementPage = () => {
       setError('Failed to load users. Please try again later.');
       setLoading(false);
     }
-  };
+  }, [filters]);
+
+  useEffect(() => {
+    // Redirect if neither superuser nor manager
+    if (!isSuperuser && !isManager) {
+      navigate('/dashboard');
+      return;
+    }
+
+    fetchUsers();
+  }, [isSuperuser, isManager, navigate, fetchUsers]);
 
   const handleFilterChange = (e) => {
     const { name, value, type, checked } = e.target;

@@ -1,6 +1,5 @@
 // pages/transactions/TransactionOptions.js
 import React from 'react';
-import { Link } from 'react-router-dom';
 
 const TransactionOptions = ({ currentUser, isCashier, isManager, setMode, navigate }) => {
   return (

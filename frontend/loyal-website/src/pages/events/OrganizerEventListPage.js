@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import api from '../../services/api';
@@ -7,7 +7,7 @@ const OrganizerEventListPage = () => {
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const { currentUser, isManager } = useAuth();
+  const { isManager } = useAuth(); 
   const [filters, setFilters] = useState({
     name: '',
     location: '',
@@ -20,11 +20,7 @@ const OrganizerEventListPage = () => {
   });
   const [totalEvents, setTotalEvents] = useState(0);
 
-  useEffect(() => {
-    fetchEvents();
-  }, [filters]);
-
-  const fetchEvents = async () => {
+  const fetchEvents = useCallback(async () => {
     setLoading(true);
     try {
       // Create query params from filters
@@ -44,7 +40,11 @@ const OrganizerEventListPage = () => {
       setError('Failed to load events. Please try again later.');
       setLoading(false);
     }
-  };
+  }, [filters]);
+
+  useEffect(() => {
+    fetchEvents();
+  }, [fetchEvents]);
 
   const handleFilterChange = (e) => {
     const { name, value, type, checked } = e.target;

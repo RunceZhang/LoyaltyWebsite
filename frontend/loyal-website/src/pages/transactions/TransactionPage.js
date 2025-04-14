@@ -9,7 +9,7 @@ import ProcessRedemptionForm from './ProcessRedemptionForm';
 import TransactionOptions from './TransactionOptions';
 
 const TransactionPage = () => {
-  const { currentUser, isCashier, isManager, isVerified } = useAuth();
+  const { currentUser, isCashier, isManager } = useAuth();
   const navigate = useNavigate();
 
   // States for various transaction modes

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import api from '../../services/api';
@@ -23,11 +23,7 @@ const EventManagementPage = () => {
   });
   const [successMessage, setSuccessMessage] = useState('');
 
-  useEffect(() => {
-    fetchEvent();
-  }, [eventId]);
-
-  const fetchEvent = async () => {
+  const fetchEvent = useCallback(async () => {
     setLoading(true);
     try {
       const response = await api.get(`/events/${eventId}`);
@@ -48,7 +44,11 @@ const EventManagementPage = () => {
       setError('Failed to load event details. Please try again later.');
       setLoading(false);
     }
-  };
+  }, [eventId]);
+
+  useEffect(() => {
+    fetchEvent();
+  }, [fetchEvent]);
 
   const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target;

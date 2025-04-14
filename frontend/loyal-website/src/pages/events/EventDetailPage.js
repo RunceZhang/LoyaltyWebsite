@@ -1,5 +1,5 @@
 // pages/events/EventDetailPage.js
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { eventService } from '../../services/api';
 import { useAuth } from '../../contexts/AuthContext';
@@ -21,11 +21,7 @@ const EventDetailPage = () => {
   // Check if user is an organizer
   const [isOrganizer, setIsOrganizer] = useState(false);
   
-  useEffect(() => {
-    fetchEventDetails();
-  }, [eventId]);
-  
-  const fetchEventDetails = async () => {
+  const fetchEventDetails = useCallback(async () => {
     try {
       setLoading(true);
       setError('');
@@ -47,7 +43,11 @@ const EventDetailPage = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [eventId, currentUser]);
+  
+  useEffect(() => {
+    fetchEventDetails();
+  }, [fetchEventDetails]);
   
   const handleRsvp = async () => {
     try {

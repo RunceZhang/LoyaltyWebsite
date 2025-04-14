@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import api from '../../services/api';
@@ -16,22 +16,7 @@ const EventGuestsPage = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [filteredGuests, setFilteredGuests] = useState([]);
 
-  useEffect(() => {
-    fetchEvent();
-  }, [eventId]);
-
-  useEffect(() => {
-    if (guests.length > 0 && searchQuery) {
-      setFilteredGuests(guests.filter(guest =>
-        guest.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        guest.utorid.toLowerCase().includes(searchQuery.toLowerCase())
-      ));
-    } else {
-      setFilteredGuests(guests);
-    }
-  }, [guests, searchQuery]);
-
-  const fetchEvent = async () => {
+  const fetchEvent = useCallback(async () => {
     setLoading(true);
     try {
       const response = await api.get(`/events/${eventId}`);
@@ -44,7 +29,22 @@ const EventGuestsPage = () => {
       setError('Failed to load event details. Please try again later.');
       setLoading(false);
     }
-  };
+  }, [eventId]);
+
+  useEffect(() => {
+    fetchEvent();
+  }, [fetchEvent]);
+
+  useEffect(() => {
+    if (guests.length > 0 && searchQuery) {
+      setFilteredGuests(guests.filter(guest =>
+        guest.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        guest.utorid.toLowerCase().includes(searchQuery.toLowerCase())
+      ));
+    } else {
+      setFilteredGuests(guests);
+    }
+  }, [guests, searchQuery]);
 
   const handleAddGuest = async (e) => {
     e.preventDefault();

@@ -1,5 +1,5 @@
 // pages/events/EventListPage.js
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { eventService } from '../../services/api';
 
@@ -17,11 +17,7 @@ const EventListPage = () => {
     showFull: false,
   });
   
-  useEffect(() => {
-    fetchEvents();
-  }, []);
-  
-  const fetchEvents = async () => {
+  const fetchEvents = useCallback(async () => {
     try {
       setLoading(true);
       setError('');
@@ -60,7 +56,11 @@ const EventListPage = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [filters]);
+  
+  useEffect(() => {
+    fetchEvents();
+  }, [fetchEvents]);
   
   // Handle filter change
   const handleFilterChange = (e) => {

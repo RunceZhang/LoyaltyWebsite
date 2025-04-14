@@ -48,7 +48,7 @@ const PromotionCreatePage = () => {
 
 
         try {
-            const response = await promotionService.createPromotion(payload);
+            await promotionService.createPromotion(payload);
             setSuccess('Promotion created successfully!');
             // Redirect to the promotion list page after successful creation
             navigate('/promotions');
