@@ -1,6 +1,6 @@
 // components/qrcode/QRCodeComponents.js
 import React from 'react';
-import QRCode from 'qrcode.react';
+import { QRCodeSVG as QRCode } from 'qrcode.react';
 import { useAuth } from '../../contexts/AuthContext';
 
 // QR code component for user identification
