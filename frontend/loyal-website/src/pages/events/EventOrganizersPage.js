@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import api from '../../services/api';
 
@@ -12,11 +12,7 @@ const EventOrganizersPage = () => {
   const [organizerFormData, setOrganizerFormData] = useState({ utorid: '' });
   const [organizers, setOrganizers] = useState([]);
 
-  useEffect(() => {
-    fetchEvent();
-  }, [eventId]);
-
-  const fetchEvent = async () => {
+  const fetchEvent = useCallback(async () => {
     setLoading(true);
     try {
       const response = await api.get(`/events/${eventId}`);
@@ -28,7 +24,11 @@ const EventOrganizersPage = () => {
       setError('Failed to load event details. Please try again later.');
       setLoading(false);
     }
-  };
+  }, [eventId]);
+
+  useEffect(() => {
+    fetchEvent();
+  }, [fetchEvent]);
 
   const handleAddOrganizer = async (e) => {
     e.preventDefault();
